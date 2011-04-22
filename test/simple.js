@@ -7,6 +7,7 @@ var server = net.createServer(function (c) {
   c.write('hello\r\n', 'utf8');
   c.pipe(c);
   console.log("exit parent");
+  server.close();
   process.exit(0);
 });
 
