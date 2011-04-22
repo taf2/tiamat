@@ -1,3 +1,3 @@
 # fork.node
 
-A C++ add-on for Node.js to add process.fork
+Add fork to node.js
