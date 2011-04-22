@@ -1,0 +1,19 @@
+{
+    "name" : "fork",
+    "version" : "0.0.1",
+    "description" : "Add-on adding fork for *nix",
+    "author": "Todd",
+    "contributors": [
+    ],
+    "repository" : {
+      "type" : "git",
+      "url" : "http://github.com/taf2/fork.node.git" 
+    },
+    "main": "./lib/fork",
+    "scripts" : {
+        "preinstall" : "node-waf configure build"
+    },
+    "engines" : {
+       "node" : ">= 0.4.0"
+    }
+}
