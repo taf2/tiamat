@@ -1,29 +1,28 @@
-var net = require('net');
 var fork = require(__dirname + '/../build/default/fork.node');
+var net = require("net");
+var netBinding = process.binding('net');
 
-var sockpath = 'socket';
-// create a server
-var server = net.createServer(function (c) {
-  c.write('hello\r\n', 'utf8');
-  c.pipe(c);
-  console.log("exit parent");
-  server.close();
-  process.exit(0);
-});
-
+var pipeFDs = netBinding.pipe();
 var pid = fork.fork();
 
-if (pid > 0) {
-  console.log("parent:" + fork.getpid());
-  server.listen(sockpath);
+if (pid == 0) {
+  netBinding.close(pipeFDs[1]); // close the write fd
+  console.log("child:"  + fork.getpid());
+  var pipeReadStream = new net.Stream();
+  pipeReadStream.addListener('data', function(data) {
+    console.log(data.toString('utf8'));
+  });
+  pipeReadStream.addListener('data', function(data) {
+    console.log("parent closed the write pipe\r\n");
+  });
+  pipeReadStream.open(pipeFDs[0]);
+  pipeReadStream.resume();
 }
 else {
-  delete server;
-  console.log("child:"  + fork.getpid());
-  setTimeout(function() {
-    // create a client to connect to parent server
-    var client = new net.Socket({type:'unix'});
-    client.connect(sockpath, function() { console.log("connected"); });
-    client.on("data", function(d) { console.log(d.toString('utf8')); });
-  }, 100);
+  netBinding.close(pipeFDs[0]); // close the read fd 
+  console.log("parent:" + fork.getpid());
+  var pipeWriteStream = new net.Stream();
+  pipeWriteStream.open(pipeFDs[1]);
+  pipeWriteStream.write("\nhello unix\r\n");
+  netBinding.close(pipeFDs[1]); // close the read fd 
 }
