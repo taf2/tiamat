@@ -1,6 +1,5 @@
 var fork = require(__dirname + '/../build/default/fork.node');
 var net = require("net");
-var fs = require("fs");
 var netBinding = process.binding('net');
 
 var pipeFDs = netBinding.pipe();

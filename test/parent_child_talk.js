@@ -29,14 +29,14 @@ function talkOnPipe(writeStream, msg) {
 function listenOnPipe(parser, pipe, cb) {
   var pipeReadStream = new net.Stream();
 
-  pipeReadStream.addListener('data', function(data) {
+  pipeReadStream.on('data', function(data) {
     parser.parse(data);
-    pipeReadStream.resume();
   });
 
-  pipeReadStream.addListener('end', function(data) {
+  pipeReadStream.on('end', function(data) {
     console.log(fork.getpid() + " write pipe was closed");
   });
+
   pipeReadStream.open(pipe[0]); // listen on the read fd
   pipeReadStream.resume();
 }
@@ -50,11 +50,12 @@ if (pid == 0) {
     console.log(fork.getpid() + ", child received: %s, %s", data, JSON.parse(data));
   });
   parser.on("error", function(msg) { console.error(msg); });
+
   listenOnPipe(parser, pipeFDs[0], function() {
     console.log("parent closed write pipe");
   });
 
-  for (var i = 0; i < 1000; ++i) {
+  for (var i = 0; i < 10; ++i) {
     talkOnPipe(writeStream, {message:("hello parent, " + i)});
   }
   writeStream.destroySoon();
@@ -71,9 +72,8 @@ else {
   listenOnPipe(parser, pipeFDs[1], function() {
     console.log("child closed write pipe");
   });
-  for (var i = 0; i < 1000; ++i) {
+  for (var i = 0; i < 10; ++i) {
     talkOnPipe(writeStream, {message:("hello child, " + i)});
   }
   writeStream.destroySoon();
-  //netBinding.close(pipeFDs[1][0]);
 }
