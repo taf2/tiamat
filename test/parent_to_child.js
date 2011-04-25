@@ -1,5 +1,6 @@
 var fork = require(__dirname + '/../build/default/fork.node');
 var net = require("net");
+var fs = require("fs");
 var netBinding = process.binding('net');
 
 var pipeFDs = netBinding.pipe();
@@ -12,7 +13,7 @@ if (pid == 0) {
   pipeReadStream.addListener('data', function(data) {
     console.log(data.toString('utf8'));
   });
-  pipeReadStream.addListener('data', function(data) {
+  pipeReadStream.addListener('end', function(data) {
     console.log("parent closed the write pipe\r\n");
   });
   pipeReadStream.open(pipeFDs[0]);
@@ -23,6 +24,6 @@ else {
   console.log("parent:" + fork.getpid());
   var pipeWriteStream = new net.Stream();
   pipeWriteStream.open(pipeFDs[1]);
-  pipeWriteStream.write("\nhello unix\r\n");
-  netBinding.close(pipeFDs[1]); // close the read fd 
+  pipeWriteStream.write("\nhello child\r\n");
+  netBinding.close(pipeFDs[1]); // close the write fd 
 }

@@ -39,6 +39,14 @@ static Handle<Value> Fork(const Arguments& args) {
     //
     // See: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#code_ev_fork_code_the_audacity_to_re
     ev_default_fork();
+/*    ev_loop_destroy (EV_DEFAULT);
+  // Initialize the default ev loop.
+#if defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
+  ev_default_loop(EVBACKEND_KQUEUE);
+#else
+  ev_default_loop(EVFLAG_AUTO);
+#endif*/
+
     return scope.Close(Number::New(pid));
 
   }
@@ -55,6 +63,14 @@ static Handle<Value> GetPid(const Arguments& args) {
   return scope.Close(Number::New(getpid()));
 }
 
+// 
+// Sleep, would like a better solution than this... e.g. wait on an IO object and exit when the IO object closes
+static Handle<Value> Sleep(const Arguments& args) {
+  HandleScope scope;
+  ev_sleep(0.01);
+  return scope.Close(Number::New(1));
+}
+
 //
 // Initialize this add-on
 //
@@ -63,4 +79,5 @@ extern "C" void init(Handle<Object> target) {
   
   NODE_SET_METHOD(target, "fork", Fork);
   NODE_SET_METHOD(target, "getpid", GetPid);
+  NODE_SET_METHOD(target, "sleep", Sleep);
 }
