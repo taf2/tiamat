@@ -49,24 +49,25 @@ Okay that's kinda neat now you have two processes, but how do you make them talk
     netBinding.close(pipeFDs[1]); // close the read fd 
   }
 
-It now should be possible to wrap all this into a nicer Worker interface e.g. http://dev.w3.org/html5/workers/
-The one issue with the Worker interface when using fork is after forking we can't allow the child/worker process
-to continue through the main execution path... so we'll probably need somthing slightly different
-e.g.
+Okay that's nice but pipes are tricky and ensuring a complete message is even harder, how about this:
 
-  var worker = new Worker('worker.js'); // forks
-  if (worker.child()) { // the child process loads and either evals worker.js or runs worker.js in a sandbox...
-    return; // prevent child process from further execution
+  var worker = new Worker();
+
+  if (worker.child()) {
+    worker.on("message", function(data) {
+      console.log("message from parent: " + data);
+      worker.postMessage("hello parent");
+    });
+
+    worker.postMessage("hello parent");
   }
-  worker.on("message", function(msg) {
-    console.log(msg);
-  });
-  worker.post({msg:"hello"});
+  else {
 
-The one component of this that is possibly not as nice is that we use a pipe to communicate between the parent and child process.
-The result is we need to use a protocol to parse the messages from the parent to the child and from the child to the parent. (2 pipes)
-If we had threads we could avoid the protocol parsing and just use a queue data strucutre, that might make the message passing faster,
-but the advantage of separate processes and sandboxing is security and robustness a worker might die but the parent can live on and recover...
+    worker.on("message", function(data) {
+      console.log("message from child: " + data);
+    });
 
-Again, this is all just a work in progress and the goal here is allow synchronous code to run in a separate worker process while the main process
-handles incoming HTTP requests.  Feedback on this approach would be awesome.
+    worker.postMessage("hello child");
+
+    worker.exit(); // tell the worker to exit once it's finished
+  }
