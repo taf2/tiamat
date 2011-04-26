@@ -1,10 +1,10 @@
 # fork.node
 
-Add fork to node.js
+Add fork to node.js and an easy to use interface for passing messages between multiple processes
 
 ## Install
 
-  npm install fork
+    npm install fork
 
 ## Fork away
 
