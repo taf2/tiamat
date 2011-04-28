@@ -44,6 +44,9 @@ static Handle<Value> Fork(const Arguments& args) {
     // See: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#code_ev_fork_code_the_audacity_to_re
     //printf("eio req: %d, threads: %d, pending: %d, ready: %d\n", eio_nreqs(), eio_nthreads(), eio_npending(), eio_nready());
     ev_default_fork();
+#if HAVE_SRANDDEV == 1
+    sranddev();
+#endif
 
     return scope.Close(Number::New(pid));
 

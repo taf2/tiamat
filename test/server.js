@@ -53,19 +53,13 @@ Daemon.daemonize(function() {
       }
       else {
         console.error("pid: %d is dead", pid);
-        //remove.push(index);
-        // respawn the child. Which one died?
-        //if (forkChild(children, index)) {
-        //  console.error("new child is ready: %d", process.pid);
-        //  break;
-       // }
         var pid = fork.fork();
         if (pid == 0) {
-          resetWorker();
+          resetWorker(); // remove all existing signal handlers
           if (process.platform != 'darwin') {
             process.title = "node worker[" + index + "]";
           }
-          runWorker(server_socket, i);
+          runWorker(server_socket, i); // start up an http server proc
           return;
         }
         else {
