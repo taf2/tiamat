@@ -1,7 +1,7 @@
 {
-    "name" : "fork",
-    "version" : "0.0.2",
-    "description" : "Add fork to node.js",
+    "name" : "worker",
+    "version" : "0.0.1",
+    "description" : "Add process fork and worker interface to node.js",
     "author": "Todd",
     "contributors": [
     ],
