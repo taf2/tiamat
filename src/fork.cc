@@ -46,6 +46,8 @@ static Handle<Value> Fork(const Arguments& args) {
     ev_default_fork();
 #if HAVE_SRANDDEV == 1
     sranddev();
+#else
+    srand(time(NULL));
 #endif
 
     return scope.Close(Number::New(pid));
@@ -111,7 +113,7 @@ static Handle<Value> ReOpenStdIO(const Arguments& args) {
   String::Utf8Value stdout_path(args[0]->ToString());
   String::Utf8Value stderr_path(args[1]->ToString());
 
-  stdin  = freopen("/dev/null", "a", stdin);
+  stdin  = freopen("/dev/null", "r", stdin);
   stdout = freopen(*stdout_path, "a", stdout);
   stderr = freopen(*stderr_path, "a", stderr);
 
