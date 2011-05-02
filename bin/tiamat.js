@@ -12,49 +12,66 @@ var path   = require('path');
 var fs     = require('fs');
 
 function cli() {
-  opt.setopt("vhdc:s:p::");
   var options = {};
+  var help = function() {
+    opt.showHelp("tiamat", function (o) {
+      switch (o) {
+        case "h": return "Show this help menu";
+        case "v": return "Show version string";
+        case "c": return "Server configuration path";
+        case "d": return "Daemonize the server";
+        case "s": return "Worker JS file to load exports.run = function(config, cb)...";
+        case "p": return "Change the default port to bind";
+        default:  return "Option '"+o+"'";
+      }
+    });
+  }
 
-  opt.getopt(function (o, p) {
-    switch (o) {
-      case "h":
-        opt.showHelp("tiamat", function (o) {
-          switch (o) {
-            case "h": return "Show this help menu";
-            case "c": return "Server configuration path";
-            case "d": return "Daemonize the server";
-            default:  return "Option '"+o+"'";
+  try {
+
+    opt.setopt("vhdc:s:p::");
+
+    opt.getopt(function (o, p) {
+      switch (o) {
+        case "h":
+          help();
+          process.exit(0);
+          break;
+        case "v":
+          var package = JSON.parse(fs.readFileSync(__dirname + "/../package.json"));
+          console.log("version: %s", package.version);
+          process.exit(0);
+          break;
+        case "c":
+          options['config'] = p[0];
+          break;
+        case "d":
+          options['daemonize'] = true;
+          break;
+        case "s":
+          if (!p[0].match(/^\//)) {
+            options['worker_app'] = path.join(process.cwd(),  p[0]);
           }
-        });
-        process.exit(0);
-        break;
-      case "v":
-        var package = JSON.parse(fs.readFileSync(__dirname + "/../package.json"));
-        console.log("version: %s", package.version);
-        process.exit(0);
-        break;
-      case "c":
-        options['config'] = p[0];
-        break;
-      case "d":
-        options['daemonize'] = true;
-        break;
-      case "s":
-        if (!p[0].match(/^\//)) {
-          options['worker_app'] = path.join(process.cwd(),  p[0]);
-        }
-        else {
-          options['worker_app'] = p[0];
-        }
-        break;
-      case "p":
-        options['listen_port'] = p[0];
-        break;
-      default:
-        break;
-    }
-  });
-  return options;
+          else {
+            options['worker_app'] = p[0];
+          }
+          break;
+        case "p":
+          options['listen_port'] = p[0];
+          break;
+        default:
+          console.error("unknown option: " + o);
+          help();
+          process.exit(1);
+          break;
+      }
+    });
+    return options;
+  } catch(e) {
+    console.error(e);
+    help();
+    process.exit(1);
+  }
 }
 
 function verifyConfig(config) {
