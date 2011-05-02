@@ -9,10 +9,10 @@ var Daemon = require("tiamat/daemon.js");
 var Config = require("tiamat/config.js").ConfigLoader;
 var opt    = require('getopt');
 var path   = require('path');
+var fs     = require('fs');
 
 function cli() {
-  var opt = require('getopt');
-  opt.setopt("hdc:s:p::");
+  opt.setopt("vhdc:s:p::");
   var options = {};
 
   opt.getopt(function (o, p) {
@@ -26,6 +26,11 @@ function cli() {
             default:  return "Option '"+o+"'";
           }
         });
+        process.exit(0);
+        break;
+      case "v":
+        var package = JSON.parse(fs.readFileSync(__dirname + "/../package.json"));
+        console.log("version: %s", package.version);
         process.exit(0);
         break;
       case "c":
