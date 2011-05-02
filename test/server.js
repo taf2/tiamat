@@ -91,6 +91,7 @@ function launchServer() {
     update_pids.forEach(function(set) {
       workers[set[0]] = set[1];
     });
+    console.error("reaped");
     console.error(workers);
     return false;
   }
@@ -98,7 +99,7 @@ function launchServer() {
   function runWorker(fd,id) {
     try {
       if (process.platform != 'darwin') { // setting the process title on Mac is not really safe...
-        process.title = "node worker[" + i + "]";
+        process.title = "node worker[" + id + "]";
       }
       console.error(posix.getpid() + ", parent is: %d", posix.getppid());
 
@@ -116,6 +117,7 @@ function launchServer() {
       server.listenFD(fd);
 
     } catch(e) {
+      console.error("run worker error: %s", e.message);
       console.error(e);
     }
   }
