@@ -83,7 +83,7 @@ Daemon.daemonize(function() {
 
   function killWorker(pid, sig) {
     console.error("send(%d): %d, %s", fork.getpid(), pid, sig);
-    try { process.kill(pid, sig); } catch(e) { console.error(e); }
+    try { process.kill(pid, sig); } catch(e) { console.error("error"); console.error(e); }
   }
 
   function signalWorkers(sig) {
@@ -111,6 +111,7 @@ Daemon.daemonize(function() {
     update_pids.forEach(function(set) {
       workers[set[0]] = set[1];
     });
+    console.error("reaped");
     console.error(workers);
     return false;
   }
@@ -118,7 +119,7 @@ Daemon.daemonize(function() {
   function runWorker(fd,id) {
     try {
       if (process.platform != 'darwin') { // setting the process title on Mac is not really safe...
-        process.title = "node worker[" + i + "]";
+        process.title = "node worker[" + id + "]";
       }
       console.error(fork.getpid() + ", parent is: %d", fork.getppid());
 
@@ -128,7 +129,9 @@ Daemon.daemonize(function() {
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end('Hello World:' + fork.getpid() + '\n');
       }).listenFD(fd);
+
     } catch(e) {
+      console.error("run worker error: %s", e.message);
       console.error(e);
     }
   }
@@ -176,7 +179,6 @@ Daemon.daemonize(function() {
     pipeFDs = netBinding.pipe();
     reader = new net.Stream();
     writer = new net.Stream();
-
 
     KILLSIGS.forEach(function(sig) { process.on(sig, exitMaster); });
     process.on('exit', tearDownMaster);
