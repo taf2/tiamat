@@ -149,7 +149,9 @@ static Handle<Value> FdCloseOnExec(const Arguments& args) {
 
   return scope.Close(Number::New(fcntl(fd, F_SETFD, flags | FD_CLOEXEC)));
 }
+
 // set the fd to stay open after an exec call
+// see: http://www.gnu.org/s/hello/manual/libc/Descriptor-Flags.html
 static Handle<Value> FdOpenOnExec(const Arguments& args) {
   HandleScope scope;
   if (!args[0]->IsNumber()) {
