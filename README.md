@@ -48,14 +48,14 @@ In the configuration file you tell Tiamat where you want things like stdout and 
 
 ## Define your application as an export
 
-    exports.run = function() {
+    exports.run = function(cb) {
       // create the HTTP server
       var http = require('http');
       var server = http.createServer(function (req, res) {
         res.writeHead(200, {'Content-Type': 'text/plain'});
         res.end('Hello World:' + process.pid + '\n');
       });
-      return server;
+      cb(server);
     }
 
 ## Run your application

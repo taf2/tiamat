@@ -6,6 +6,7 @@ exports.load = function() {
   return {
     tcp: 'tcp4',
     backlog: 128,
+    //listen_sock: "/tmp/tiamat.sock",
     listen_addr: "127.0.0.1",
     listen_port: 1337,
     workers: 2,
@@ -39,5 +40,6 @@ exports.load = function() {
         console.error("no oldbin");
       }
     }
-  }
+  };
+
 };

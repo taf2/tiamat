@@ -62,8 +62,8 @@ function verifyConfig(config) {
 function applyDefaults(config) {
   if (!config['tcp']) { config['tcp'] = 'tcp4'; }
   if (!config['backlog']) { config['backlog'] = 128; }
-  if (!config['listen_port']) { config['listen_port'] = 1337; }
-  if (!config['listen_addr']) { config['listen_addr'] = "127.0.0.1"; }
+  if (!config['listen_sock'] && !config['listen_port']) { config['listen_port'] = 1337; }
+  if (!config['listen_sock'] && !config['listen_addr']) { config['listen_addr'] = "127.0.0.1"; }
   if (!config['workers']) { config['workers'] = 1; }
   if (!config['working_directory']) { config['working_directory'] = process.cwd(); }
   if (!config['stderr_path']) { config['stderr_path'] = "/dev/null"; }
