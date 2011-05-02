@@ -1,4 +1,4 @@
-Worker = require(__dirname + "/../lib/worker.js").Worker;
+Worker = require(__dirname + "/../lib/tiamat/worker.js").Worker;
 
 var worker = new Worker();
 

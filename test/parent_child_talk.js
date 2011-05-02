@@ -1,5 +1,5 @@
 var posix = require(__dirname + '/../build/default/posixtools.node');
-var PipeParser = require(__dirname + '/../lib/pipe_parser').PipeParser;
+var PipeParser = require(__dirname + '/../lib/tiamat/pipe_parser').PipeParser;
 var net = require("net");
 var fs = require("fs");
 var netBinding = process.binding('net');

@@ -1,7 +1,7 @@
 // create a daemon using fork the parent process will go away after daemonize
 var fs = require("fs");
 
-daemonize = require(__dirname + "/../lib/daemon.js").daemonize;
+daemonize = require(__dirname + "/../lib/tiamat/daemon.js").daemonize;
 
 daemonize(function() {
   console.log("daemonized");
