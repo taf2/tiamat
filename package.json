@@ -1,7 +1,7 @@
 {
-    "name" : "worker",
-    "version" : "0.0.1",
-    "description" : "Add process fork and worker interface to node.js",
+    "name" : "tiamat",
+    "version" : "0.0.5",
+    "description" : "A forking server for node.js",
     "author": "Todd",
     "contributors": [
     ],
@@ -9,7 +9,10 @@
       "type" : "git",
       "url" : "http://github.com/taf2/fork.node.git" 
     },
-    "main": "./lib/fork",
+    "bin": {
+      "tiamat": "bin/tiamat.js"
+    },
+    "main": "./lib/tiamat",
     "scripts" : {
         "preinstall" : "node-waf configure build"
     },

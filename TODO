@@ -1,0 +1,3 @@
+* health check from master (e.g. check workers are responsive within config.timeout seconds)
+* workers should die if master died
+* cleanup cli
