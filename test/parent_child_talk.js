@@ -1,4 +1,4 @@
-var fork = require(__dirname + '/../build/default/fork.node');
+var posix = require(__dirname + '/../build/default/posixtools.node');
 var PipeParser = require(__dirname + '/../lib/pipe_parser').PipeParser;
 var net = require("net");
 var fs = require("fs");
@@ -7,7 +7,7 @@ var netBinding = process.binding('net');
 var pipeFDs = [];
 pipeFDs.push(netBinding.pipe());
 pipeFDs.push(netBinding.pipe());
-var pid = fork.fork();
+var pid = posix.fork();
 
 function prepareTalk(pipe) {
   netBinding.close(pipe[0]); // close the read fd 
@@ -34,7 +34,7 @@ function listenOnPipe(parser, pipe, cb) {
   });
 
   pipeReadStream.on('end', function(data) {
-    console.log(fork.getpid() + " write pipe was closed");
+    console.log(posix.getpid() + " write pipe was closed");
   });
 
   pipeReadStream.open(pipe[0]); // listen on the read fd
@@ -42,12 +42,12 @@ function listenOnPipe(parser, pipe, cb) {
 }
 
 if (pid == 0) {
-  console.log("child:"  + fork.getpid());
+  console.log("child:"  + posix.getpid());
   prepareListen(pipeFDs[0]);
   var writeStream = prepareTalk(pipeFDs[1]);
   var parser = new PipeParser();
   parser.on("message", function(data) {
-    console.log(fork.getpid() + ", child received: %s, %s", data, JSON.parse(data));
+    console.log(posix.getpid() + ", child received: %s, %s", data, JSON.parse(data));
   });
   parser.on("error", function(msg) { console.error(msg); });
 
@@ -61,12 +61,12 @@ if (pid == 0) {
   writeStream.destroySoon();
 }
 else {
-  console.log("parent:" + fork.getpid());
+  console.log("parent:" + posix.getpid());
   prepareListen(pipeFDs[1]);
   var writeStream = prepareTalk(pipeFDs[0]);
   var parser = new PipeParser();
   parser.on("message", function(data) {
-    console.log(fork.getpid() + ", parent received: %s, %s", data, JSON.parse(data));
+    console.log(posix.getpid() + ", parent received: %s, %s", data, JSON.parse(data));
   });
   parser.on("error", function(msg) { console.error(msg); });
   listenOnPipe(parser, pipeFDs[1], function() {

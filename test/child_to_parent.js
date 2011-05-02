@@ -1,13 +1,13 @@
-var fork = require(__dirname + '/../build/default/fork.node');
+var posix = require(__dirname + '/../build/default/posixtools.node');
 var net = require("net");
 var netBinding = process.binding('net');
 
 var pipeFDs = netBinding.pipe();
-var pid = fork.fork();
+var pid = posix.fork();
 
 if (pid == 0) {
   netBinding.close(pipeFDs[0]); // close the read fd 
-  console.log("child:"  + fork.getpid());
+  console.log("child:"  + posix.getpid());
   var pipeWriteStream = new net.Stream();
   pipeWriteStream.open(pipeFDs[1]);
   pipeWriteStream.write("\nhello parent\r\n");
@@ -15,7 +15,7 @@ if (pid == 0) {
 }
 else {
   netBinding.close(pipeFDs[1]); // close the write fd
-  console.log("parent:" + fork.getpid());
+  console.log("parent:" + posix.getpid());
   var pipeReadStream = new net.Stream();
   pipeReadStream.addListener('data', function(data) {
     console.log(data.toString('utf8'));
