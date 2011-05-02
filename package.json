@@ -1,6 +1,6 @@
 {
     "name" : "tiamat",
-    "version" : "0.0.5",
+    "version" : "0.0.7",
     "description" : "A forking server for node.js",
     "author": "Todd",
     "contributors": [
