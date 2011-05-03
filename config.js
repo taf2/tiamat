@@ -1,7 +1,6 @@
 exports.load = function() {
-  var path  = require("path");
-  var fs    = require("fs");
-  var posix = require(__dirname + "/build/default/posixtools.node");
+  require.paths.unshift(__dirname + "/lib");
+  var oldbinQuit = require("tiamat/config_tools").oldbinQuit;
 
   return {
     tcp: 'tcp4',
@@ -25,20 +24,7 @@ exports.load = function() {
     },
     after_fork: function(config, pid, ppid, wid) {
       console.error("after fork: %d", process.pid);
-      var oldbin = config.pidfile + ".oldbin";
-      if (path.existsSync(oldbin)) {
-        var oldpid = fs.readFileSync(oldbin, 'ascii');
-        if (parseInt(oldpid) > 1) {
-          console.error("send(%d) old master the kill sig: %s", posix.getpid(), oldpid);
-          process.kill(parseInt(oldpid), "SIGQUIT");
-        }
-        else {
-          console.error("nopid in oldbin: %s", oldpid);
-        }
-      }
-      else {
-        console.error("no oldbin");
-      }
+      oldbinQuit(config, pid, ppid, wid);
     }
   };
 
