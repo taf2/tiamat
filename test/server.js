@@ -104,17 +104,18 @@ function launchServer() {
       console.error(posix.getpid() + ", parent is: %d", posix.getppid());
 
       var app = require(workerScript);
-      var server = app.run();
+      app.run({}, function(server) {
 
-      process.on("SIGQUIT", function() {
-        console.error("%d, got sigquit", posix.getpid());
-        server.close(); // stop listening for new connections
-        setTimeout(function() {
-          process.exit(1);
-        }, 30000); // really quit in 30 seconds if we haven't already
+        process.on("SIGQUIT", function() {
+          console.error("%d, got sigquit", posix.getpid());
+          server.close(); // stop listening for new connections
+          setTimeout(function() {
+            process.exit(1);
+          }, 30000); // really quit in 30 seconds if we haven't already
+        });
+
+        server.listenFD(fd);
       });
-
-      server.listenFD(fd);
 
     } catch(e) {
       console.error("run worker error: %s", e.message);
