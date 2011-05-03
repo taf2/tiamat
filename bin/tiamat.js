@@ -5,8 +5,11 @@
 require.paths.unshift(__dirname + "/../lib");
 
 var Tiamat = require("tiamat/server.js").Tiamat;
+
 var Daemon = require("tiamat/daemon.js");
-var Config = require("tiamat/config.js").ConfigLoader;
+var console.log(Daemon);
+var Config = require("tiamat/config_loader.js").ConfigLoader;
+
 var opt    = require('getopt');
 var path   = require('path');
 var fs     = require('fs');
@@ -88,9 +91,9 @@ function applyDefaults(config) {
   if (!config['listen_sock'] && !config['listen_addr']) { config['listen_addr'] = "127.0.0.1"; }
   if (!config['workers']) { config['workers'] = 1; }
   if (!config['working_directory']) { config['working_directory'] = process.cwd(); }
-  if (!config['stderr_path']) { config['stderr_path'] = "/dev/null"; }
-  if (!config['stdout_path']) { config['stdout_path'] = "/dev/null"; }
-  if (!config['pidfile']) { config['pidfile'] = "/tmp/tiamat-" + process.pid + ".pid"; }
+  if (config.daemonize && !config['stderr_path']) { config['stderr_path'] = "/dev/null"; }
+  if (config.daemonize && !config['stdout_path']) { config['stdout_path'] = "/dev/null"; }
+  if (config.daemonize && !config['pidfile']) { config['pidfile'] = "/tmp/tiamat-" + process.pid + ".pid"; }
   return config;
 }
 
