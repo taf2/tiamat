@@ -46,6 +46,11 @@ function cli() {
           break;
         case "c":
           options['config'] = p[0];
+          if (!options['config'].match(/^\//)) {
+            var confdir = options.config;
+            options.config = path.join(process.cwd(),  options.config);
+            console.error("path(%s) not absolute - assume relative to %s as %s", confdir, process.cwd(), options.config); 
+          }
           break;
         case "d":
           options['daemonize'] = true;
@@ -117,7 +122,7 @@ if (options['config']) {
     verifyConfig(config);
     runApp(config);
   });
-  config.load(options['config']);
+  config.load(options.config);
 }
 else {
   options = applyDefaults(options);
