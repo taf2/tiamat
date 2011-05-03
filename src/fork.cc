@@ -39,6 +39,12 @@ static Handle<Value> Fork(const Arguments& args) {
   HandleScope scope;
   pid_t sid, pid;
   int i, new_fd;
+
+  bool restartLoop = true;
+  
+  if (args.Length() > 0 && args[0]->IsBoolean()) {
+    restartLoop = args[0]->ToBoolean()->Value();
+  }
 //  ev_fork watcher;
 //  memset(&watcher, 0, sizeof(ev_fork));
 
@@ -58,13 +64,10 @@ static Handle<Value> Fork(const Arguments& args) {
     // See: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#code_ev_fork_code_the_audacity_to_re
     //printf("eio req: %d, threads: %d, pending: %d, ready: %d\n", eio_nreqs(), eio_nthreads(), eio_npending(), eio_nready());
     ev_loop_fork (EV_DEFAULT);
-    ev_break (EV_A_ EVBREAK_ALL);
-#if HAVE_SRANDDEV == 1
-    sranddev();
-#else
-    srand(time(NULL));
-#endif
-    ev_run (EV_A_ 0);
+    if (restartLoop) {
+      ev_break (EV_A_ EVBREAK_ALL);
+      ev_run (EV_A_ 0);
+    }
 
     return scope.Close(Number::New(pid));
 
