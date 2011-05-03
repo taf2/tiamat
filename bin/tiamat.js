@@ -24,6 +24,7 @@ function cli() {
         case "d": return "Daemonize the server";
         case "s": return "Worker JS file to load exports.run = function(config, cb)...";
         case "p": return "Change the default port to bind";
+        case "t": return "Test configuration";
         default:  return "Option '"+o+"'";
       }
     });
@@ -31,7 +32,7 @@ function cli() {
 
   try {
 
-    opt.setopt("vhdc:s:p::");
+    opt.setopt("tvhdc:s:p::");
 
     opt.getopt(function (o, p) {
       switch (o) {
@@ -49,7 +50,7 @@ function cli() {
           if (!options['config'].match(/^\//)) {
             var confdir = options.config;
             options.config = path.join(process.cwd(),  options.config);
-            console.error("path(%s) not absolute - assume relative to %s as %s", confdir, process.cwd(), options.config); 
+            //console.error("path(%s) not absolute - assume relative to %s as %s", confdir, process.cwd(), options.config); 
           }
           break;
         case "d":
@@ -65,6 +66,9 @@ function cli() {
           break;
         case "p":
           options['listen_port'] = p[0];
+          break;
+        case "t":
+          options['test_config'] = true;
           break;
         default:
           console.error("unknown option: " + o);
@@ -84,6 +88,31 @@ function cli() {
 function verifyConfig(config) {
   if (!config['worker_app']) {
     console.error("Must provide a worker_app in either a referenced configuration file or as -s 'your_app.js'");
+    process.exit(1);
+  }
+
+  if (!path.existsSync(config.worker_app)) {
+    console.error("Worker app path not found: %s", config.worker_app);
+    process.exit(1);
+  }
+
+  if (config.stderr_path && !path.existsSync(path.dirname(config.stderr_path))) {
+    console.error("stderr path not found: %s", config.stderr_path);
+    process.exit(1);
+  }
+
+  if (config.stdout_path && !path.existsSync(path.dirname(config.stdout_path))) {
+    console.error("stdout path not found: %s", config.stdout_path);
+    process.exit(1);
+  }
+
+  if (config.pidfile && !path.existsSync(path.dirname(config.pidfile))) {
+    console.error("pidfile path not found: %s", config.pidfile);
+    process.exit(1);
+  }
+
+  if (config.working_directory && !path.existsSync(config.working_directory)) {
+    console.error("working_directory path not found: %s", config.working_directory);
     process.exit(1);
   }
 }
@@ -115,17 +144,30 @@ function runApp(config) {
 
 var options = cli();
 
-if (options['config']) {
+if (options.test_config) {
   var config = new Config();
   config.on("loaded", function(config) {
     config = applyDefaults(config);
     verifyConfig(config);
-    runApp(config);
+    console.log("valid");
+    process.exit(0);
   });
   config.load(options.config);
 }
 else {
-  options = applyDefaults(options);
-  verifyConfig(options);
-  runApp(options);
+
+  if (options['config']) {
+    var config = new Config();
+    config.on("loaded", function(config) {
+      config = applyDefaults(config);
+      verifyConfig(config);
+      runApp(config);
+    });
+    config.load(options.config);
+  }
+  else {
+    options = applyDefaults(options);
+    verifyConfig(options);
+    runApp(options);
+  }
 }
