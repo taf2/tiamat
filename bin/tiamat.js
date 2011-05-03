@@ -7,7 +7,6 @@ require.paths.unshift(__dirname + "/../lib");
 var Tiamat = require("tiamat/server.js").Tiamat;
 
 var Daemon = require("tiamat/daemon.js");
-var console.log(Daemon);
 var Config = require("tiamat/config_loader.js").ConfigLoader;
 
 var opt    = require('getopt');
