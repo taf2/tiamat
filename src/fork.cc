@@ -28,6 +28,10 @@
 using namespace v8;
 using namespace node;
 
+//static void node_fork_cb (EV_P_ ev_fork *fork_w, int revents) {
+//  fprintf(stderr, "forked\n");
+//}
+
 //
 // Add fork method to allow forking node.js process
 //
@@ -35,6 +39,11 @@ static Handle<Value> Fork(const Arguments& args) {
   HandleScope scope;
   pid_t sid, pid;
   int i, new_fd;
+//  ev_fork watcher;
+//  memset(&watcher, 0, sizeof(ev_fork));
+
+//  ev_fork_init(&watcher, node_fork_cb);
+//  ev_fork_start(&watcher);
 
   pid = fork();
   // http://www.unixguide.net/unix/programming/1.1.2.shtml
@@ -48,12 +57,14 @@ static Handle<Value> Fork(const Arguments& args) {
     //
     // See: http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#code_ev_fork_code_the_audacity_to_re
     //printf("eio req: %d, threads: %d, pending: %d, ready: %d\n", eio_nreqs(), eio_nthreads(), eio_npending(), eio_nready());
-    ev_default_fork();
+    ev_loop_fork (EV_DEFAULT);
+    ev_break (EV_A_ EVBREAK_ALL);
 #if HAVE_SRANDDEV == 1
     sranddev();
 #else
     srand(time(NULL));
 #endif
+    ev_run (EV_A_ 0);
 
     return scope.Close(Number::New(pid));
 
@@ -238,6 +249,8 @@ static Handle<Value> ReOpenStdIO(const Arguments& args) {
 //
 extern "C" void init(Handle<Object> target) {
   HandleScope scope;
+
+  // install post fork handler
   
   NODE_SET_METHOD(target, "fork", Fork);
   NODE_SET_METHOD(target, "getpid", GetPid);
