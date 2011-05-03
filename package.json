@@ -1,10 +1,9 @@
 {
     "name" : "tiamat",
-    "version" : "0.1.2",
+    "version" : "0.1.3",
     "description" : "A forking server for node.js",
-    "author": "Todd",
-    "contributors": [
-    ],
+    "author": "todd (taf2)",
+    "contributors": [ ],
     "repository" : {
       "type" : "git",
       "url" : "http://github.com/taf2/fork.node.git" 
@@ -14,9 +13,12 @@
     },
     "main": "./lib/tiamat",
     "scripts" : {
-        "preinstall" : "node-waf configure build"
+      "preinstall" : "node-waf configure build"
     },
     "engines" : {
        "node" : ">= 0.4.0"
+    },
+    "dependencies" : {
+      "getopt": "0.1.0"
     }
 }
