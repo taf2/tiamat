@@ -1,5 +1,2 @@
 * health check from master (e.g. check workers are responsive within config.timeout seconds)
-* workers should die if master died
-* USR1 logfile rotation
-* cleanup cli
 * support unix sockets
