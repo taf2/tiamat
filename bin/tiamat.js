@@ -85,51 +85,6 @@ function cli() {
   }
 }
 
-function verifyConfig(config) {
-  if (!config['worker_app']) {
-    console.error("Must provide a worker_app in either a referenced configuration file or as -s 'your_app.js'");
-    process.exit(1);
-  }
-
-  if (!path.existsSync(config.worker_app)) {
-    console.error("Worker app path not found: %s", config.worker_app);
-    process.exit(1);
-  }
-
-  if (config.stderr_path && !path.existsSync(path.dirname(config.stderr_path))) {
-    console.error("stderr path not found: %s", config.stderr_path);
-    process.exit(1);
-  }
-
-  if (config.stdout_path && !path.existsSync(path.dirname(config.stdout_path))) {
-    console.error("stdout path not found: %s", config.stdout_path);
-    process.exit(1);
-  }
-
-  if (config.pidfile && !path.existsSync(path.dirname(config.pidfile))) {
-    console.error("pidfile path not found: %s", config.pidfile);
-    process.exit(1);
-  }
-
-  if (config.working_directory && !path.existsSync(config.working_directory)) {
-    console.error("working_directory path not found: %s", config.working_directory);
-    process.exit(1);
-  }
-}
-
-function applyDefaults(config) {
-  if (!config['tcp']) { config['tcp'] = 'tcp4'; }
-  if (!config['backlog']) { config['backlog'] = 128; }
-  if (!config['listen_sock'] && !config['listen_port']) { config['listen_port'] = 1337; }
-  if (!config['listen_sock'] && !config['listen_addr']) { config['listen_addr'] = "127.0.0.1"; }
-  if (!config['workers']) { config['workers'] = 1; }
-  if (!config['working_directory']) { config['working_directory'] = process.cwd(); }
-  if (config.daemonize && !config['stderr_path']) { config['stderr_path'] = "/dev/null"; }
-  if (config.daemonize && !config['stdout_path']) { config['stdout_path'] = "/dev/null"; }
-  if (config.daemonize && !config['pidfile']) { config['pidfile'] = "/tmp/tiamat-" + process.pid + ".pid"; }
-  return config;
-}
-
 function runApp(config) {
   if (process.env['__NIX_FD'] || !config.daemonize) { // reexec from old master or just don't daemonize
     Tiamat(config);
@@ -144,30 +99,18 @@ function runApp(config) {
 
 var options = cli();
 
-if (options.test_config) {
-  var config = new Config();
-  config.on("loaded", function(config) {
-    config = applyDefaults(config);
-    verifyConfig(config);
-    console.log("valid");
-    process.exit(0);
+var configLoader = new Config();
+if (options.config) {
+  configLoader.on("loaded", function(config) {
+    config = configLoader.defaults(config);
+    if (!configLoader.verify(config)) { process.exit(1); }
+    if (options.test_config) { console.log("valid"); process.exit(0); }
+    runApp(config);
   });
-  config.load(options.config);
+  configLoader.load(options.config);
 }
 else {
-
-  if (options['config']) {
-    var config = new Config();
-    config.on("loaded", function(config) {
-      config = applyDefaults(config);
-      verifyConfig(config);
-      runApp(config);
-    });
-    config.load(options.config);
-  }
-  else {
-    options = applyDefaults(options);
-    verifyConfig(options);
-    runApp(options);
-  }
+  options = configLoader.defaults(options);
+  if (!configLoader.verify(config)) { process.exit(1); }
+  runApp(options);
 }
