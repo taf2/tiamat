@@ -9,7 +9,7 @@ exports.load = function() {
     listen_addr: "127.0.0.1",
     listen_port: 1337,
     workers: 2,
-    timeout: 45,
+    timeout: 15,
     worker_app: __dirname + "/test/worker1.js",
     daemonize: true,
     working_directory: __dirname,
@@ -17,13 +17,13 @@ exports.load = function() {
     stdout_path: __dirname + "/stdout.log",
     pidfile: __dirname + "/pidfile.pid",
     before_exec: function(config) {
-      console.error("before exec");
+      console.log("before exec");
     },
     before_fork: function(config, wid) {
-      console.error("before fork");
+      console.log("before fork");
     },
     after_fork: function(config, pid, ppid, wid) {
-      console.error("after fork: %d", process.pid);
+      console.log("after fork: %d", process.pid);
       oldbinQuit(config, pid, ppid, wid);
     }
   };
