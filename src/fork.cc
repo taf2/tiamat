@@ -66,7 +66,8 @@ static Handle<Value> Fork(const Arguments& args) {
     ev_loop_fork (EV_DEFAULT);
     if (restartLoop) {
       ev_break (EV_A_ EVBREAK_ALL);
-      ev_run (EV_A_ 0);
+      //ev_run (EV_A_ 0);
+      ev_run (EV_A_ EVRUN_NOWAIT);
     }
 
     return scope.Close(Number::New(pid));
@@ -145,7 +146,7 @@ static Handle<Value> Execve(const Arguments& args) {
     String::Utf8Value env(envp_handle->Get(Integer::New(i))->ToString());
     envp[i] = strdup(*env);
   }
-  fprintf(stderr, "execute file: %s\n", *file);
+  fprintf(stdout, "execute file: %s\n", *file);
 
   int r = execve(*file, argv, envp);
 
@@ -214,9 +215,11 @@ static Handle<Value> IsAlive(const Arguments& args) {
   int status;
   int pid = args[0]->ToInteger()->Value();
   int r = waitpid(pid, &status, WNOHANG | WUNTRACED);
-//  fprintf(stderr, "%d, %d:%s\n", r, errno, strerror(errno));
-//  fflush(stderr);
-  if (r == -1) { return scope.Close(Boolean::New(false)); }
+  if (r == -1) {
+    fprintf(stderr, "%d, %d:%s\n", r, errno, strerror(errno));
+    fflush(stderr);
+    return scope.Close(Boolean::New(false));
+  }
   return scope.Close(Boolean::New(true));
 }
 
@@ -225,7 +228,7 @@ static Handle<Value> IsAlive(const Arguments& args) {
 // stdout and stderr may be reopened to a path or /dev/null
 // stdin is always reopened to /dev/null
 //
-//   fork.reopen_stdio("/path/to/stdout", "/path/to/stderr");
+//   posix.reopen_stdio("/path/to/stdout", "/path/to/stderr");
 //
 static Handle<Value> ReOpenStdIO(const Arguments& args) {
   HandleScope scope;
