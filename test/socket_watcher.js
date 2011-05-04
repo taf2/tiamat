@@ -106,7 +106,7 @@ Connection.prototype.close = function() {
   var conn = new Connection("127.0.0.1", 27017);
 
   conn.on("connect", function() {
-    console.error("connected");
+    console.error("\nconnected\r\n");
     process.exit(0);
   });
 
