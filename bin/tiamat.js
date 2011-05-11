@@ -111,6 +111,6 @@ if (options.config) {
 }
 else {
   options = configLoader.defaults(options);
-  if (!configLoader.verify(config)) { process.exit(1); }
+  if (!configLoader.verify(options)) { process.exit(1); }
   runApp(options);
 }
