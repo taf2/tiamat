@@ -6,10 +6,20 @@ A forking server for node.js - think multi process non blocking server
 
     npm install tiamat
 
-
 ## Running with Tiamat
 
 Tiamat loads a worker.js script that should export a run method.  The run method should return your server.
+
+For example a simple way to expose your HTTP server would be:
+
+    exports.run = function(config, cb) {
+      var http  = require("http");
+      var server = http.createServer(function(req, res) {
+        res.end("Hello World");
+      });
+      // call back to let the world know our server is ready
+      cb(server);
+    };
 
 The server can be an HTTP Server or any other kind of TCP server.
 
