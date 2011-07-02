@@ -1,12 +1,12 @@
 {
   "name" : "tiamat",
-  "version" : "0.1.8",
+  "version" : "0.2.0",
   "description" : "A forking server for node.js",
   "author": "todd (taf2)",
   "contributors": [ ],
   "repository" : {
     "type" : "git",
-    "url" : "http://github.com/taf2/fork.node.git" 
+    "url" : "http://github.com/taf2/tiamat.git"
   },
   "bin": {
     "tiamat": "bin/tiamat.js"
