@@ -12,5 +12,8 @@ var server = http.createServer(function (req, res) {
   var record = geoip.City.record_by_addr(geodb, ipaddr);
   res.end('Hello World:' + process.pid + '\n' + JSON.stringify(record) + "\n");
 });
+if (!process.env.TIAMAT) {
+  server.listen(4001);
+}
 
 module.exports = server;
