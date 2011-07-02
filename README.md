@@ -4,31 +4,31 @@ A forking server for node.js - think multi process non blocking server
 
 ## Install
 
-    npm install tiamat
+    npm install -g tiamat
 
 ## Running with Tiamat
 
 Tiamat loads a worker.js script that should export a run method.  The run method should return your server.
 
-For example a simple way to expose your HTTP server would be:
+For example, a simple way to expose your HTTP server would be:
 
-    exports.run = function(config, cb) {
+    exports.run = function(config, next) {
       var http  = require("http");
       var server = http.createServer(function(req, res) {
         res.end("Hello World");
       });
-      // call back to let the world know our server is ready
-      cb(server);
+      next(server); // let tiamat handle binding your server
     };
 
 The server can be an HTTP Server or any other kind of TCP server.
 
-Tiamat simply passes the listening file descriptor down to each worker. Inside of each worker process Tiamat, will require the worker.js script
-invoke run and call listenFD on the returned server object.
+Tiamat simply passes the listening file descriptor down to each worker. Inside of each worker process Tiamat, will require the worker.js script,
+invoke run, and call listenFD on the returned server object.
 
 ## The Config File
 
-In the configuration file you tell Tiamat where you want things like stdout and stderr to be redirected.  How many worker processes to start, what port to listen on etc...
+In the configuration file you tell Tiamat where you want things like stdout and stderr to be redirected.
+How many worker processes to start, what port to listen on etc...
 
     exports.load = function() {
       return {
@@ -56,22 +56,26 @@ In the configuration file you tell Tiamat where you want things like stdout and 
       }
     };
 
-## Define your application as an export
+* before_exec is called when you send USR2 signal in the master process.
+* before_fork is called each time *before* a new worker is forked in the master process
+* after_fork is called each time *after* a new worker is forked in the new worker process
 
-    exports.run = function(cb) {
-      // create the HTTP server
-      var http = require('http');
-      var server = http.createServer(function (req, res) {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end('Hello World:' + process.pid + '\n');
-      });
-      cb(server);
-    }
 
 ## Run your application
 
     tiamat.js -s your_app.js -p 3000
 
+## Signals to manage the process
+
+Tiamat listens to the following signals to control the master and the workers.
+
+SIGHUP: tells the master to reload the configuration file
+SIGQUIT: tells the workers to gracefully close connections and stop working
+SIGTTIN: increase the number of worker processes by 1
+SIGTTOU: decrease the number of worker processes by 1
+SIGWINCH: stop all workers, gracefully bring the worker count to 0
+SIGUSR1: rotate log files
+SIGUSR2: reexecute the running binary.  A QUIT or TERM signal can be sent to the old master to have the new process take its place.
 
 ## How It Works?
 
@@ -142,3 +146,7 @@ Okay that's nice but pipes are tricky and ensuring a complete message is even ha
 
       worker.exit(); // tell the worker to exit once it's finished
     }
+
+## Inspiration and credit
+
+  unicorn the ruby server
