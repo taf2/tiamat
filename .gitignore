@@ -2,3 +2,4 @@ build
 .lock-wscript
 test/*.log
 test/*.pid
+node_modules
