@@ -25,6 +25,23 @@ The server can be an HTTP Server or any other kind of TCP server.
 Tiamat simply passes the listening file descriptor down to each worker. Inside of each worker process Tiamat, will require the worker.js script,
 invoke run, and call listenFD on the returned server object.
 
+## Using Tiamat with Express
+
+    var express     = require('express'),
+        app         = module.exports = express.createServer(),
+
+    app.get('/', function(req, res) {
+      res.send('active');
+    });
+
+    if (!process.env.TIAMAT) {
+      app.listen(process.env.PORT || 3000);
+    }
+
+The only thing special here is to not have your app.js bind, instead because it exports the expressServer, tiamat will handle binding for you.
+
+    tiamat -s app.js
+
 ## The Config File
 
 In the configuration file you tell Tiamat where you want things like stdout and stderr to be redirected.
