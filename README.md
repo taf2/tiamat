@@ -69,13 +69,13 @@ How many worker processes to start, what port to listen on etc...
 
 Tiamat listens to the following signals to control the master and the workers.
 
-SIGHUP: tells the master to reload the configuration file
-SIGQUIT: tells the workers to gracefully close connections and stop working
-SIGTTIN: increase the number of worker processes by 1
-SIGTTOU: decrease the number of worker processes by 1
-SIGWINCH: stop all workers, gracefully bring the worker count to 0
-SIGUSR1: rotate log files
-SIGUSR2: reexecute the running binary.  A QUIT or TERM signal can be sent to the old master to have the new process take its place.
+* SIGHUP: tells the master to reload the configuration file
+* SIGQUIT: tells the workers to gracefully close connections and stop working
+* SIGTTIN: increase the number of worker processes by 1
+* SIGTTOU: decrease the number of worker processes by 1
+* SIGWINCH: stop all workers, gracefully bring the worker count to 0
+* SIGUSR1: rotate log files
+* SIGUSR2: reexecute the running binary.  A QUIT or TERM signal can be sent to the old master to have the new process take its place.
 
 ## How It Works?
 
