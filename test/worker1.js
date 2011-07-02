@@ -1,4 +1,4 @@
-exports.run = function(config, cb) {
+exports.run = function(config, next) {
   var geoip = require('geoip');
   var querystring = require('querystring');
   var geodb = geoip.open(__dirname + "/../../GeoLiteCity.dat");
@@ -14,5 +14,5 @@ exports.run = function(config, cb) {
     res.end('Hello World:' + process.pid + '\n' + JSON.stringify(record) + "\n");
   });
 
-  cb(server);
+  next(server);
 };

@@ -10,20 +10,21 @@ exports.load = function() {
     listen_port: 1337,
     workers: 2,
     timeout: 15,
+    loglevel: 'info',
     worker_app: __dirname + "/test/worker1.js",
-    daemonize: true,
+    daemonize: false,
     working_directory: __dirname,
     stderr_path: __dirname + "/stderr.log",
     stdout_path: __dirname + "/stdout.log",
     pidfile: __dirname + "/pidfile.pid",
     before_exec: function(config) {
-      console.log("before exec");
+      console.log("config, before exec");
     },
     before_fork: function(config, wid) {
-      console.log("before fork");
+      console.log("config, before fork");
     },
     after_fork: function(config, pid, ppid, wid) {
-      console.log("after fork: %d", process.pid);
+      console.log("config, after fork: %d", process.pid);
       oldbinQuit(config, pid, ppid, wid);
     }
   };
