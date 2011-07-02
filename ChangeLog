@@ -1,0 +1,4 @@
+0.2.1
+  * Set environment TIAMAT=1 for worker process e.g. process.env.TIAMAT
+0.2.0
+  * Allow loading apps using module.exports = app;
