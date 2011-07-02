@@ -1,3 +1,4 @@
+0.2.2  
   * Added common logging methods internally logm and logw to support configurable logger output based on level 'debug','info', 'error'
 0.2.1
   * Set environment TIAMAT=1 for worker process e.g. process.env.TIAMAT
