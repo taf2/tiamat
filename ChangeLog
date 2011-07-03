@@ -1,3 +1,7 @@
+0.2.3
+  * Throttle worker process restarts if the last attempt to start a worker was less than 5 seconds ago
+  * Better error reporting, if worker fails to start on boot abort master with sigquit
+  * Support flat object configuration files e.g. module.exports = { /* your config */ }
   * Add a default after_fork to ConfigLoader
 0.2.2  
   * Added common logging methods internally logm and logw to support configurable logger output based on level 'debug','info', 'error'
